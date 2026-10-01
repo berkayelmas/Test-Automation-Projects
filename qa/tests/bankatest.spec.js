@@ -14,6 +14,11 @@ test.beforeEach(async ({ page }) => {
   await page.waitForURL('**/overview.htm', { timeout: 30000 });
 });
 
+test('1 - Login basarili', async ({ page }) => {
+  await expect(page.locator('#showOverview')).toBeVisible({ timeout: 10000 });
+  await expect(page.locator('body')).toContainText('Accounts Overview');
+});
+
 test('2 - Hesaplar arasi para transferi', async ({ page }) => {
   await page.locator('a:has-text("Transfer Funds")').click();
   await page.waitForSelector('#fromAccountId', { timeout: 20000 });
@@ -34,8 +39,6 @@ test('2 - Hesaplar arasi para transferi', async ({ page }) => {
 test('3 - Fatura Odeme', async ({ page }) => {
   await page.locator('a:has-text("Bill Pay")').click();
   await page.waitForSelector('input[name="payee.name"]', { timeout: 20000 });
-
-  // LANETLI ALANI JS ILE DOLDUR - GORUNURLUK KONTROLU YOK
   await page.evaluate(() => {
     const fill = (name, value) => {
       const el = document.querySelector(`input[name="${name}"]`);
@@ -55,7 +58,6 @@ test('3 - Fatura Odeme', async ({ page }) => {
     fill('payee.verifyAccount', '12345');
     fill('amount', '250');
   });
-
   await page.waitForTimeout(1000);
   await page.locator('input[value="Send Payment"]').click();
   await expect(page.locator('body')).toContainText('Bill Payment Complete', { timeout: 20000 });
