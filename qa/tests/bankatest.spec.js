@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
-  // 1. Database'i sıfırla - Internal Error'i bitirir
   await page.goto('https://parabank.parasoft.com/parabank/admin.htm', { timeout: 30000 });
   const cleanBtn = page.locator('button[value="CLEAN"]');
   if (await cleanBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
@@ -9,12 +8,11 @@ test.beforeEach(async ({ page }) => {
     await page.waitForTimeout(3000);
   }
 
-  // 2. Login - john/demo Parabank'in orijinal hesabi
   await page.goto('https://parabank.parasoft.com/parabank/index.htm', { timeout: 30000 });
   await page.locator('input[name="username"]').fill('john');
   await page.locator('input[name="password"]').fill('demo');
   await page.locator('input[value="Log In"]').click();
-  await expect(page.locator('h1.title')).toContainText('Accounts Overview', { timeout: 15000 });
+  await expect(page.getByRole('heading', { name: 'Accounts Overview' })).toBeVisible({ timeout: 15000 });
 });
 
 test('1 - Login basarili', async ({ page }) => {
@@ -27,7 +25,7 @@ test('2 - Hesaplar arasi para transferi', async ({ page }) => {
   await page.locator('#fromAccountId').selectOption({ index: 0 });
   await page.locator('#toAccountId').selectOption({ index: 1 });
   await page.locator('input[value="Transfer"]').click();
-  await expect(page.locator('h1.title')).toContainText('Transfer Complete');
+  await expect(page.getByRole('heading', { name: 'Transfer Complete' })).toBeVisible();
 });
 
 test('3 - Fatura Odeme', async ({ page }) => {
@@ -42,5 +40,5 @@ test('3 - Fatura Odeme', async ({ page }) => {
   await page.locator('input[name="payee.verifyAccount"]').fill('12345');
   await page.locator('input[name="amount"]').fill('250');
   await page.locator('input[value="Send Payment"]').click();
-  await expect(page.locator('h1.title')).toContainText('Bill Payment Complete');
+  await expect(page.getByRole('heading', { name: 'Bill Payment Complete' })).toBeVisible();
 });
