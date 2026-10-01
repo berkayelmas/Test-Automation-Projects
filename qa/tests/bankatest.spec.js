@@ -1,9 +1,18 @@
 import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
+  // 1. Önce database'i sıfırla, site kendine gelsin
+  await page.goto('https://parabank.parasoft.com/parabank/admin.htm');
+  const cleanBtn = page.locator('button:has-text("CLEAN"), button:has-text("Initialize")');
+  if (await cleanBtn.isVisible()) {
+    await cleanBtn.click();
+    await page.waitForTimeout(2000);
+  }
+
+  // 2. Sonra normal login
   await page.goto('https://parabank.parasoft.com/parabank/index.htm');
-  await page.locator('input[name="username"]').fill('bekotest');
-  await page.locator('input[name="password"]').fill('testuser');
+  await page.locator('input[name="username"]').fill('john');
+  await page.locator('input[name="password"]').fill('demo');
   await page.locator('input[value="Log In"]').click();
 });
 
@@ -20,7 +29,7 @@ test('2 - Hesaplar arasi para transferi', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('Transfer Complete');
 });
 
-test('3 - Fatura Odeme - Elektrik Faturasi', async ({ page }) => {
+test('3 - Fatura Odeme', async ({ page }) => {
   await page.locator('a:text("Bill Pay")').click();
   await page.locator('input[name="payee.name"]').fill('Elektrik');
   await page.locator('input[name="payee.address.street"]').fill('Test Sokak');
